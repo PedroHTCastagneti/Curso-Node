@@ -1,15 +1,16 @@
 const express = require('express');
 const app = express();
 app.use(express.json());
+const server=  [];
 
 app.get('/projetos', (req,res) => {
-    return res.json({
-        name:"Projeto 1",
-        owner:"Pedro"
-    });
+    return res.json(
+        server
+    );
 });
 
 app.post('/projetos', (req,res) => {
+    server.push(req.body);
 
     console.log(req.body)
     return res.json({
@@ -21,17 +22,27 @@ app.post('/projetos', (req,res) => {
 });
 
 app.put('/projetos/:id', (req,res) => {
-    console.log(req.body);
-    return res.json({
-        mensagem:"isnira uma rota",
-    });
+    for (let index = 0; index < server.length; index++) {
+        if (server[index]?.id===Number(req.params?.id)){
+        server[index] = {...server[index],... req?.body}
+        return res.json(server[index]);
+    }
+        
+    }
+
+    return res.status(404).json()
 });
 
 app.delete('/projetos/:id', (req,res) => {
-    console.log(req.params);
-    return res.json({
-        mensagem:"delete",
-    });
+    for (let index = 0; index < server.length; index++) {
+        if (server[index]?.id===Number(req.params?.id)){
+        server.pop(index)
+        return res.status(204).json()
+    }
+        
+    }
+
+    return res.status(404).json()
 });
 
 app.listen(3000, () => {
