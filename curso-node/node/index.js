@@ -3,6 +3,7 @@ const app = express();
 app.use(express.json());
 const server=  [];
 const { Prisma, PrismaClient } = require('@prisma/client');
+const { PrismaClientKnownRequestError } = require('@prisma/client/runtime/library');
 const prisma = new PrismaClient();
 
  
@@ -14,9 +15,20 @@ app.get('/projetos', async (req,res) => {
     return res.json(posts)
 });
 
+
 app.post('/usuario', async(req,res) =>{
-    const result = await prisma.user.create({data: req.body});
-    return res.json(result);
+    try {
+        const result = await prisma.user.create({data: req.body});
+        return res.json(result);
+    }catch(error){
+        if(error instanceof PrismaClientKnownRequestError){
+            if(error.code==="P2002"){
+                console.log("Erro de chave unica");
+            }
+        }
+        console.log("Erro tratado");
+        return res.status(400).json()
+    }
 });
 
 app.post('/post', async (req, res) => {
@@ -32,28 +44,23 @@ app.post('/post', async (req, res) => {
     res.json(result)
   })
 
-app.put('/projetos/:id', (req,res) => {
-    for (let index = 0; index < server.length; index++) {
-        if (server[index]?.id===Number(req.params?.id)){
-        server[index] = {...server[index],... req?.body}
-        return res.json(server[index]);
-    }
-        
-    }
+app.put('/projetop/:id', async (req,res) => {
+    const {id} = req.params;
+    const post = await prisma.post.update(id, req.body)
 
-    return res.status(404).json()
+    return res.json(post)
 });
 
-app.delete('/projetos/:id', (req,res) => {
-    for (let index = 0; index < server.length; index++) {
-        if (server[index]?.id===Number(req.params?.id)){
-        server.pop(index)
-        return res.status(204).json()
-    }
-        
-    }
+app.delete('/projetod/:id', async (req,res) => {
 
-    return res.status(404).json()
+    const {id} = req.params
+    const post = await prisma.post.delete({
+        where: {
+            id: Number(id)
+        }
+    })
+    
+    return res.json(post)
 });
 
 app.listen(3000, () => {
