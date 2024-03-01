@@ -68,23 +68,67 @@ app.post('/post', async (req, res) => {
   })
 
 
-
-
-app.put('/projetop/:id', async (req,res) => {
+app.patch('/projetopcp/:id', async (req,res) => {
     const {id} = req.params;
-    const post = await prisma.post.update ({
+    const {title, content, published} = req.body;
+    const post = await prisma.post.update({
         where: {id: Number(id)},
         data: {
-            id: id= Number(id),
-            title: req.body,
-            content: req.body,
-            published: req.body,
-            author: { connect: { email: authorEmail } },
+            title,
+            content,
+            published,
+        }
+    })
+
+
+    return res.json(post)
+});
+
+app.patch('/projetopcu/:id', async (req,res) => {
+    const {id} = req.params;
+    const {email, name} = req.body;
+    const post = await prisma.user.update({
+        where: {id: Number(id)},
+        data: {
+           email,
+           name,
+        }
+    })
+
+    return res.json(post)
+});
+
+
+
+app.put('/projetopp/:id', async (req,res) => {
+    const {id} = req.params;
+    const {title, content, published} = req.body;
+    const post = await prisma.post.updateMany ({
+        where: {id: Number(id)},
+        data: {
+            title,
+            content,
+            published,
         },
     })
 
     return res.json(post)
 });
+
+app.put('/projetopu/:id', async (req,res) => {
+    const {id} = req.params;
+    const {email, name} = req.body;
+    const post = await prisma.user.updateMany ({
+        where: {id: Number(id)},
+        data: {
+            email,
+            name,
+        },
+    })
+
+    return res.json(post)
+});
+
 
 
 
