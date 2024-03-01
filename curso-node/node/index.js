@@ -15,6 +15,29 @@ app.get('/projetos', async (req,res) => {
     return res.json(posts)
 });
 
+app.get('/projetosu/:id', async (req,res) => {
+    
+    const {id} = req.params
+    const user = await prisma.user.findUnique({
+        where: {id: Number(id)}
+    });
+
+    return res.json(user)
+});
+
+app.get('/projetosp/:id', async (req,res) => {
+
+    const {id} = req.params
+    const pst = await prisma.post.findUnique({
+        where: {id: Number(id)}
+    });
+
+    return res.json(pst)
+});
+
+
+
+
 
 app.post('/usuario', async(req,res) =>{
     try {
@@ -44,17 +67,43 @@ app.post('/post', async (req, res) => {
     res.json(result)
   })
 
+
+
+
 app.put('/projetop/:id', async (req,res) => {
     const {id} = req.params;
-    const post = await prisma.post.update(id, req.body)
+    const post = await prisma.post.update ({
+        where: {id: Number(id)},
+        data: {
+            id: id= Number(id),
+            title: req.body,
+            content: req.body,
+            published: req.body,
+            author: { connect: { email: authorEmail } },
+        },
+    })
 
     return res.json(post)
 });
 
-app.delete('/projetod/:id', async (req,res) => {
+
+
+app.delete('/projetodp/:id', async (req,res) => {
 
     const {id} = req.params
     const post = await prisma.post.delete({
+        where: {
+            id: Number(id)
+        }
+    })
+    
+    return res.json(post)
+});
+
+app.delete('/projetodu/:id', async (req,res) => {
+
+    const {id} = req.params
+    const post = await prisma.user.delete({
         where: {
             id: Number(id)
         }
