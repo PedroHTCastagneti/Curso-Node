@@ -84,6 +84,7 @@ app.patch('/projetopcp/:id', async (req,res) => {
     return res.json(post)
 });
 
+
 app.patch('/projetopcu/:id', async (req,res) => {
     const {id} = req.params;
     const {email, name} = req.body;
@@ -102,13 +103,20 @@ app.patch('/projetopcu/:id', async (req,res) => {
 
 app.put('/projetopp/:id', async (req,res) => {
     const {id} = req.params;
-    const {title, content, published} = req.body;
-    const post = await prisma.post.updateMany ({
+    const {title, content, author, published} = req.body;
+    const post = await prisma.post.upsert ({
         where: {id: Number(id)},
-        data: {
+        update: {
             title,
             content,
             published,
+            authorId: author
+        },
+        create: {
+            title,
+            content,
+            published,
+            authorId: author
         },
     })
 
@@ -118,7 +126,7 @@ app.put('/projetopp/:id', async (req,res) => {
 app.put('/projetopu/:id', async (req,res) => {
     const {id} = req.params;
     const {email, name} = req.body;
-    const post = await prisma.user.updateMany ({
+    const post = await prisma.user.upsert ({
         where: {id: Number(id)},
         data: {
             email,
